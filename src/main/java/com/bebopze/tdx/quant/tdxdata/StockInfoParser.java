@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -32,12 +32,12 @@ public class StockInfoParser {
         // C:\soft\通达信\v_2024\跑数据专用\new_tdx\vipdoc\ds\lday\74#SPY.day
 
 
-        String filePath_a = TDX_PATH + "\\vipdoc\\sh\\lday\\sh000001.day";
-        String filePath_hk = TDX_PATH + "\\vipdoc\\ds\\lday\\31#00700.day";
-        String filePath_us = TDX_PATH + "\\vipdoc\\ds\\lday\\74#SPY.day";
+        String filePath_a = TDX_PATH + "/vipdoc/sz/lday/sz000001.day";
+        String filePath_hk = TDX_PATH + "/vipdoc/ds/lday/31#00700.day";
+        String filePath_us = TDX_PATH + "/vipdoc/ds/lday/74#SPY.day";
 
 
-        List<String[]> stockDataList = exactStock(filePath_hk);
+        List<String[]> stockDataList = parse(filePath_a);
         for (String[] stockData : stockDataList) {
             System.out.println(String.join(", ", stockData));
         }
@@ -50,12 +50,11 @@ public class StockInfoParser {
     /**
      * tdx 盘后数据（xx.day）   -   解析器
      *
-     * @param filePath 文件路径     -    \new_tdx\vipdoc\
+     * @param filePath 文件路径     -    /new_tdx/vipdoc/
      * @return
-     * @throws IOException
      */
     @SneakyThrows
-    public static List<String[]> exactStock(String filePath) {
+    public static List<String[]> parse(String filePath) {
 
         // 股票代码
         String code = parseCode(filePath);
@@ -121,15 +120,15 @@ public class StockInfoParser {
             // 日期
             int date = byteBuffer.getInt();
             // 开盘价
-            float open = byteBuffer.getFloat();
+            float open = (float) byteBuffer.getInt() / 100;
             // 最高价
-            float high = byteBuffer.getFloat();
+            float high = (float) byteBuffer.getInt() / 100;
             // 最低价
-            float low = byteBuffer.getFloat();
+            float low = (float) byteBuffer.getInt() / 100;
             // 收盘价
-            float close = byteBuffer.getFloat();
-            // 成交额（万）
-            float amount = byteBuffer.getFloat() / 10000;
+            float close = (float) byteBuffer.getInt() / 100;
+            // 成交额（元）
+            BigDecimal amount = BigDecimal.valueOf(byteBuffer.getFloat());
             // 成交量
             int vol = byteBuffer.getInt();
             // 保留字段
@@ -149,6 +148,7 @@ public class StockInfoParser {
             float ratio = Math.round((close - preClose) / preClose * 100 * 100.0f) / 100.0f;
             preClose = close;
 
+
             String[] item = {code, dd, String.format("%.2f", open), String.format("%.2f", high), String.format("%.2f", low), String.format("%.2f", close), String.format("%.2f", ratio), String.valueOf(amount), String.valueOf(vol)};
             items.add(item);
 
@@ -156,6 +156,7 @@ public class StockInfoParser {
             b += 32;
             e += 32;
         }
+
 
         return items;
     }
