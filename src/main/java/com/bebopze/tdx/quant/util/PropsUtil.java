@@ -13,7 +13,7 @@ import java.util.Properties;
  * @date: 2025/5/4
  */
 @Slf4j
-public class PropertiesUtil {
+public class PropsUtil {
 
 
     @SneakyThrows

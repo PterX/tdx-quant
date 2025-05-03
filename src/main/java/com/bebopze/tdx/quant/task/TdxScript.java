@@ -1,6 +1,5 @@
 package com.bebopze.tdx.quant.task;
 
-import com.bebopze.tdx.quant.util.PropertiesUtil;
 import com.bebopze.tdx.quant.util.WinUtils;
 import com.bebopze.tdx.quant.util.WinUtils2;
 import com.google.common.collect.Lists;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.bebopze.tdx.quant.constant.TdxConst.TDX_PATH;
 import static com.bebopze.tdx.quant.util.DateUtils.formatMillis;
 import static com.bebopze.tdx.quant.util.SleepUtils.winSleep;
 import static java.awt.event.KeyEvent.*;
@@ -28,9 +28,6 @@ import static java.awt.event.KeyEvent.*;
  */
 @Slf4j
 public class TdxScript {
-
-
-    public static final String TDX_PATH = PropertiesUtil.getTdxPath();
 
 
     public static void main(String[] args) {
