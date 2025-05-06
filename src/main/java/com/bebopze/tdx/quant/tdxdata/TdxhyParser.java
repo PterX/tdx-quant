@@ -24,23 +24,23 @@ import static com.bebopze.tdx.quant.constant.TdxConst.TDX_PATH;
 public class TdxhyParser {
 
 
-    // --------------------------------------------------------------------------- 个股-行业板块
-    private static final String filePath_hy = TDX_PATH + "/T0002/hq_cache/tdxhy.cfg";
+    private static final String filePath = TDX_PATH + "/T0002/hq_cache/tdxhy.cfg";
+
 
     public static void main(String[] args) {
 
-        parseTdxStockRelaHy(filePath_hy);
-
+        parse();
     }
 
 
     /**
-     * tdx 板块数据   ->     个股 - 行业BK
+     * tdx 板块数据   ->     个股 - 行业BK（研究行业 + 普通/细分行业）
+     * -
+     * - /new_tdx/T0002/hq_cache/tdxhy.cfg
      *
-     * @param filePath \new_tdx\T0002\hq_cache\tdxhy.cfg
      * @return
      */
-    public static void parseTdxStockRelaHy(String filePath) {
+    public static void parse() {
 
         try {
             List<String> lines = FileUtils.readLines(new File(filePath), "GB2312");
@@ -66,7 +66,7 @@ public class TdxhyParser {
 
                         // 1|900901||||
                         // 0|002710||||       ->       B股     无行业信息，直接忽略
-                        log.error("parseTdxStockRelaHy err     >>>     filePath : {} , 行数 : {} , line : {} ", filePath, i, line);
+                        log.error("TdxhyParser#parse   err     >>>     filePath : {} , 行数 : {} , line : {} ", filePath, i, line);
                         continue;
                     }
 
@@ -98,7 +98,7 @@ public class TdxhyParser {
 
         } catch (IOException e) {
 
-            log.error("parseTdxStockRelaHy err     >>>     filePath : {},   errMsg : {}", filePath, e.getMessage(), e);
+            log.error("TdxhyParser#parse   err     >>>     filePath : {},   errMsg : {}", filePath, e.getMessage(), e);
         }
     }
 
