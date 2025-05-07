@@ -42,12 +42,31 @@ public class BlockGnParser {
 
     public static void main(String[] args) {
 
-        parse("gn");
-        // parse("fg");
-        // parse("zs");
+        parse_gn();
+        parse_fg();
+        parse_zs();
 
 
         System.out.println();
+    }
+
+
+    /**
+     * /T0002/hq_cache/block_gn.dat               概念板块 - 个股列表
+     *
+     * @return
+     */
+    public static List<BlockDatDTO> parse_gn() {
+        return parse("gn");
+    }
+
+    public static List<BlockDatDTO> parse_fg() {
+        return parse("fg");
+    }
+
+
+    public static List<BlockDatDTO> parse_zs() {
+        return parse("zs");
     }
 
 
@@ -57,54 +76,38 @@ public class BlockGnParser {
      * @param blk ->   gn / fg / zs
      */
     @SneakyThrows
-    public static void parse(String blk) {
-
+    public static List<BlockDatDTO> parse(String blk) {
 
         // 读取解析
-        List<BlockDatDTO> blockDatDTOList = execParse(blk);
-
-
-//        // 异常数据 - 过滤
-//        Set<String> del = Sets.newHashSet();
-//        if ("gn".equals(blk)) {
-//            del.add("��GDR");
-//        } else if ("fg".equals(blk)) {
-//            del.add("����ͨSH");
-//            del.add("���ͨSZ");
-//            del.add("������ȯ");
-//        }
-//
-//        Iterator<BlockgnParser.BlockFile> it = blockFileList.iterator();
-//        while (it.hasNext()) {
-//            if (del.contains(it.next().name)) {
-//                it.remove();
-//            }
-//        }
+        List<BlockDatDTO> dtoList = execParse(blk);
 
 
         // 板块name - 板块code
         Map<String, String> name_code_map = name_code_map(blk);
-        System.out.println(JSON.toJSONString(name_code_map));
+        // System.out.println(JSON.toJSONString(name_code_map));
 
 
         // 补齐   板块code
-        for (BlockDatDTO block : blockDatDTOList) {
+        for (BlockDatDTO dto : dtoList) {
 
             // 锂电池概念 - 锂电池
             // 核污染防治 - 核污防治
             // 车路云（tdxzs3.cfg 不存在）   -   车联网（？？？）
             name_code_map.forEach((name, code) -> {
 
-                if (name.contains(block.name)) {
-                    block.setCode(code);
+                if (name.contains(dto.name)) {
+                    dto.setCode(code);
                 }
             });
 
 
-            if (block.code == null) {
-                log.warn("BlockGnParser#parse warn     >>>     name : {} , block : {}", block.name, JSON.toJSONString(block));
+            if (dto.code == null) {
+                log.warn("BlockGnParser#parse warn     >>>     name : {} , block : {}", dto.name, JSON.toJSONString(dto));
             }
         }
+
+
+        return dtoList;
     }
 
 
@@ -164,7 +167,7 @@ public class BlockGnParser {
     /**
      * 解析 tdxzs3.cfg，返回指定板块类型的列表
      */
-    public static Map<String, String> name_code_map(String blk) throws IOException {
+    public static Map<String, String> name_code_map(String blk) {
         Map<String, String> name_code_map = Maps.newHashMap();
 
 
@@ -219,7 +222,7 @@ public class BlockGnParser {
 
     @Data
     @AllArgsConstructor
-    static class BlockDatDTO {
+    public static class BlockDatDTO {
         /**
          * 板块-name
          */
