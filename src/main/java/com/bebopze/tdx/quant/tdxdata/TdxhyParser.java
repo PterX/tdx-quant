@@ -1,6 +1,9 @@
 package com.bebopze.tdx.quant.tdxdata;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.StringUtils;
@@ -9,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static com.bebopze.tdx.quant.constant.TdxConst.TDX_PATH;
+import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 
 
 /**
@@ -28,8 +31,8 @@ public class TdxhyParser {
 
 
     public static void main(String[] args) {
-
-        parse();
+        List<TdxhyDTO> dtoList = parse();
+        System.out.println(JSON.toJSONString(dtoList));
     }
 
 
@@ -40,7 +43,9 @@ public class TdxhyParser {
      *
      * @return
      */
-    public static void parse() {
+    public static List<TdxhyDTO> parse() {
+        List<TdxhyDTO> dtoList = Lists.newArrayList();
+
 
         try {
             List<String> lines = FileUtils.readLines(new File(filePath), "GB2312");
@@ -72,7 +77,7 @@ public class TdxhyParser {
 
 
                     // 0-深A；1-沪A；2-京A；
-                    String shj_type = strArr[0];
+                    Integer tdxMarketType = Integer.valueOf(strArr[0]);
 
                     // 000001
                     String stockCode = strArr[1];
@@ -89,10 +94,11 @@ public class TdxhyParser {
                     String hyCode_X = strArr[5];
 
 
-                    save2DB(shj_type, stockCode, hyCode_T, hyCode_X);
+                    TdxhyDTO dto = new TdxhyDTO(tdxMarketType, stockCode, hyCode_T, hyCode_X);
+                    dtoList.add(dto);
 
 
-                    System.out.println(JSON.toJSONString(strArr));
+                    System.out.println(JSON.toJSONString(dto));
                 }
             }
 
@@ -100,18 +106,22 @@ public class TdxhyParser {
 
             log.error("TdxhyParser#parse   err     >>>     filePath : {},   errMsg : {}", filePath, e.getMessage(), e);
         }
+
+
+        return dtoList;
     }
 
 
-    private static void save2DB(String shjType,
-                                String stockCode,
-                                String hyCodeT,
-                                String hyCodeX) {
+    // -----------------------------------------------------------------------------------------------------------------
 
 
-        // TODO   save2DB
-
-
+    @Data
+    @AllArgsConstructor
+    public static class TdxhyDTO {
+        private Integer tdxMarketType;
+        private String stockCode;
+        private String hyCode_T;
+        private String hyCode_X;
     }
 
 }

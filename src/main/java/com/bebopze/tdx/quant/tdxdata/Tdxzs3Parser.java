@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static com.bebopze.tdx.quant.constant.TdxConst.TDX_PATH;
+import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 
 
 /**
  * tdxzs3.cfg   -   解析
  * -
- * -   /T0002/hq_cache/tdxzs3.cfg               全部板块（以及 板块-父子关系）     ->     code - name   -   bk_type
+ * -   /T0002/hq_cache/tdxzs3.cfg               全部板块（含 板块-父子关系）     ->     code - name   -   bk_type
  *
  * @author: bebopze
  * @date: 2025/5/6
@@ -45,8 +45,10 @@ public class Tdxzs3Parser {
      * @return
      */
     public static List<Tdxzs3DTO> parse() {
+
         List<Tdxzs3DTO> dtoList = Lists.newArrayList();
         Map<String, String> TXCode_code_map = Maps.newHashMap();
+
 
         try {
             List<String> lines = FileUtils.readLines(new File(filePath), "GB2312");
@@ -95,16 +97,16 @@ public class Tdxzs3Parser {
 
 
                     // 板块类型：2-普通行业 / 3-地区板块 / 4-概念板块 / 5-风格板块 / 12-研究行业
-                    String bk_type = strArr[2];
+                    String block_type = strArr[2];
 
-                    // 1/2
+                    // 1/2（含义未知）
                     String xx_type = strArr[3];
 
-                    // 是否最后一级 ：0-父级（有下级） / 1-子级（无下级）
+                    // 是否 最后一级： 0-否（有子级）； 1-是（无子级）；
                     String end_level = strArr[4];
 
 
-                    // 1/2/3
+                    // T010101 / X100101   /   概念板块-别名
                     String TXCode = strArr[5];
 
 
@@ -119,7 +121,7 @@ public class Tdxzs3Parser {
                     String p_code = null;
 
                     int level = 1;
-                    if ("2".equals(bk_type) || "12".equals(bk_type)) {
+                    if ("2".equals(block_type) || "12".equals(block_type)) {
 
                         if (TXCode.length() == 3) {
                             level = 1;
@@ -137,7 +139,7 @@ public class Tdxzs3Parser {
                     Tdxzs3DTO dto = new Tdxzs3DTO();
                     dto.setName(name);
                     dto.setCode(code);
-                    dto.setType(bk_type);
+                    dto.setBlockType(block_type);
                     dto.setEndLevel(Integer.valueOf(end_level));
                     dto.setLevel(level);
                     dto.setTXCode(TXCode);
@@ -157,23 +159,20 @@ public class Tdxzs3Parser {
         }
 
 
-        save2DB(dtoList, TXCode_code_map);
+        // 信息补充
+        fillInfo(dtoList, TXCode_code_map);
 
 
         return dtoList;
     }
 
 
-    private static void save2DB(List<Tdxzs3DTO> dtoList,
-                                Map<String, String> TXCode_code_map) {
+    private static void fillInfo(List<Tdxzs3DTO> dtoList,
+                                 Map<String, String> TXCode_code_map) {
 
         dtoList.forEach(e -> {
             e.setPCode(TXCode_code_map.get(e.getTXCode()));
         });
-
-
-        // TODO   save2DB
-
     }
 
 
@@ -184,7 +183,7 @@ public class Tdxzs3Parser {
      * tdxzs3.cfg   -   行数据
      */
     @Data
-    static class Tdxzs3DTO {
+    public static class Tdxzs3DTO {
 
 
         // 白酒|880381|2|1|1|T030501
@@ -200,19 +199,21 @@ public class Tdxzs3Parser {
          */
         String code;
         /**
-         * 类型：2/3/4/5/12
+         * 板块类型：2/3/4/5/12
          */
-        String type;
+        String blockType;
 
         /**
          * - 未知
+         * - 暂时 无用字段
          */
         String t1;
+
 
         /**
          * 是否 最后一级： 0-否（有子级）； 1-是（无子级）；
          */
-        String t2;
+        Integer endLevel;
 
         /**
          * 关联CODE  / 概念bk-别名
@@ -225,22 +226,21 @@ public class Tdxzs3Parser {
 
         // -----------------
 
+        /**
+         * 板块level（行业板块）
+         */
         Integer level;
 
-        Integer endLevel;
 
+        /**
+         * 父级 - pTXCode
+         */
         String pTXCode;
 
+        /**
+         * 父级 - 板块code
+         */
         String pCode;
-
-
-//        Tdxzs3(String[] fields) {
-//            name = fields[0];
-//            code = fields[1];
-//            type = fields[2];
-//            t1 = fields[3];
-//            t2 = fields[4];
-//            TXCode = fields[5];
-//        }
     }
+
 }
