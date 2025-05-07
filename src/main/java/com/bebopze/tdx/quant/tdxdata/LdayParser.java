@@ -1,16 +1,22 @@
 package com.bebopze.tdx.quant.tdxdata;
 
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.google.common.collect.Lists;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
-import static com.bebopze.tdx.quant.constant.TdxConst.TDX_PATH;
+import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 
 
 /**
@@ -22,7 +28,7 @@ import static com.bebopze.tdx.quant.constant.TdxConst.TDX_PATH;
  * @date: 2024/10/9
  */
 @Slf4j
-public class StockInfoParser {
+public class LdayParser {
 
 
     public static void main(String[] args) {
@@ -32,18 +38,18 @@ public class StockInfoParser {
         // C:\soft\通达信\v_2024\跑数据专用\new_tdx\vipdoc\ds\lday\74#SPY.day
 
 
-        String filePath_a = TDX_PATH + "/vipdoc/sz/lday/sz000001.day";
+        String filePath_a = TDX_PATH + "/vipdoc/sh/lday/sh600519.day";
         String filePath_hk = TDX_PATH + "/vipdoc/ds/lday/31#00700.day";
         String filePath_us = TDX_PATH + "/vipdoc/ds/lday/74#SPY.day";
 
 
-        List<String[]> stockDataList = parse(filePath_a);
-        for (String[] stockData : stockDataList) {
-            System.out.println(String.join(", ", stockData));
+        List<LdayDTO> stockDataList = parse(filePath_a);
+        for (LdayDTO stockData : stockDataList) {
+            System.out.println(JSON.toJSONString(stockData));
         }
 
 
-        System.out.println("---------------------------------- code：" + stockDataList.get(0)[0] + "     总数：" + stockDataList.size());
+        System.out.println("---------------------------------- code：" + stockDataList.get(0).code + "     总数：" + stockDataList.size());
     }
 
 
@@ -54,7 +60,7 @@ public class StockInfoParser {
      * @return
      */
     @SneakyThrows
-    public static List<String[]> parse(String filePath) {
+    public static List<LdayDTO> parse(String filePath) {
 
         // 股票代码
         String code = parseCode(filePath);
@@ -70,7 +76,7 @@ public class StockInfoParser {
         int b = 0, e = 32;
 
 
-        List<String[]> items = new ArrayList<>();
+        List<LdayDTO> dtoList = Lists.newArrayList();
         float preClose = 0.0f;
 
 
@@ -138,7 +144,8 @@ public class StockInfoParser {
             int year = date / 10000;
             int month = (date % 10000) / 100;
             int day = date % 100;
-            String dd = String.format("%04d-%02d-%02d", year, month, day);
+            LocalDate tradeDate = LocalDate.of(year, month, day);
+            // String dd = String.format("%04d-%02d-%02d", year, month, day);
 
 
             if (i == 0) {
@@ -149,8 +156,12 @@ public class StockInfoParser {
             preClose = close;
 
 
-            String[] item = {code, dd, String.format("%.2f", open), String.format("%.2f", high), String.format("%.2f", low), String.format("%.2f", close), String.format("%.2f", ratio), String.valueOf(amount), String.valueOf(vol)};
-            items.add(item);
+            // String[] item = {code, tradeDate.format(DateTimeFormatter.BASIC_ISO_DATE), String.format("%.2f", open), String.format("%.2f", high), String.format("%.2f", low), String.format("%.2f", close), String.valueOf(amount), String.valueOf(vol), String.format("%.2f", ratio)};
+
+            LdayDTO dto = new LdayDTO(code, tradeDate, of(open), of(high), of(low), of(close), amount, of(vol), of(ratio));
+
+
+            dtoList.add(dto);
 
 
             b += 32;
@@ -158,7 +169,7 @@ public class StockInfoParser {
         }
 
 
-        return items;
+        return dtoList;
     }
 
 
@@ -170,6 +181,33 @@ public class StockInfoParser {
      */
     private static String parseCode(String filePath) {
         return filePath.split("lday")[1].split(".day")[0].split("sh|sz|bj|#")[1];
+    }
+
+
+    private static BigDecimal of(float val) {
+        return BigDecimal.valueOf(val);
+    }
+
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+
+    @Data
+    @AllArgsConstructor
+    public static class LdayDTO implements Serializable {
+
+        private String code;
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private LocalDate tradeDate;
+
+        private BigDecimal open;
+        private BigDecimal high;
+        private BigDecimal low;
+        private BigDecimal close;
+        private BigDecimal amount;
+        private BigDecimal vol;
+        private BigDecimal ratio;
     }
 
 }
