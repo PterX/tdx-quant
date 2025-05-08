@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 
 /**
  * @author: bebopze
- * @date: 2025/5/4
+ * @date: 2024/9/27
  */
 // @Scheduled("")
 @Slf4j
@@ -22,7 +22,7 @@ public class TdxTask {
     private ConfigurableApplicationContext context;
 
 
-    @PostConstruct
+    // @PostConstruct
     public void execTask_933() {
         log.info("---------------------------- 任务 [task_933 - 盘后数据下载]   执行 start ---------------------------- ");
 
@@ -37,7 +37,7 @@ public class TdxTask {
     }
 
 
-    @PostConstruct
+    // @PostConstruct
     public void execTask_902() {
         log.info("---------------------------- 任务 [task_902 - 扩展数据管理器]   执行 start ---------------------------- ");
 
@@ -52,7 +52,7 @@ public class TdxTask {
     }
 
 
-    @PostConstruct
+    // @PostConstruct
     public void execTask_921() {
         log.info("---------------------------- 任务 [task_921 - 自动选股]   执行 start ---------------------------- ");
 
