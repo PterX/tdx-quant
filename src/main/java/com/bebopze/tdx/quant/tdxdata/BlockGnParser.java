@@ -19,7 +19,7 @@ import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 
 
 /**
- * block_gn.dat / block_fg.dat / block_zs.dat   -   解析
+ * 通达信   block_gn.dat / block_fg.dat / block_zs.dat   -   解析
  * -
  * -   /T0002/hq_cache/block_gn.dat               概念板块 - 个股列表
  * -   /T0002/hq_cache/block_fg.dat               风格板块 - 个股列表
@@ -32,7 +32,6 @@ import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 public class BlockGnParser {
 
 
-    // TDX 缓存相对用户主目录的路径
     private static final String BASE_PATH = TDX_PATH + "/T0002/hq_cache/";
 
 
@@ -156,7 +155,7 @@ public class BlockGnParser {
             }
 
 
-            list.add(new BlockDatDTO(null, name, blk, stockNum, stockCodeList));
+            list.add(new BlockDatDTO(name, null, blk, stockNum, stockCodeList));
         }
 
 
@@ -174,20 +173,20 @@ public class BlockGnParser {
         List<Tdxzs3Parser.Tdxzs3DTO> dtoList = Tdxzs3Parser.parse();
 
 
-        Map<String, String> mapping = Maps.newHashMap();
+        Map<String, Integer> mapping = Maps.newHashMap();
         // 普通行业（细分行业）
-        mapping.put("hy", "2");
+        mapping.put("hy", 2);
         // 地区
-        mapping.put("dq", "3");
+        mapping.put("dq", 3);
         // 概念
-        mapping.put("gn", "4");
+        mapping.put("gn", 4);
         // 风格
-        mapping.put("fg", "5");
+        mapping.put("fg", 5);
         // 研究行业
-        mapping.put("yjhy", "12");
+        mapping.put("yjhy", 12);
         // 指数
-        mapping.put("zs", "6");
-        String type = mapping.get(blk);
+        mapping.put("zs", 6);
+        Integer type = mapping.get(blk);
 
 
         dtoList.stream().filter(e -> e.getBlockType().equals(type)).forEach(e -> {

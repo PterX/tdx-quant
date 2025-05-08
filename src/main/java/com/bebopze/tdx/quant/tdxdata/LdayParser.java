@@ -42,10 +42,16 @@ public class LdayParser {
         String filePath_hk = TDX_PATH + "/vipdoc/ds/lday/31#00700.day";
         String filePath_us = TDX_PATH + "/vipdoc/ds/lday/74#SPY.day";
 
+        String filePath_bk = TDX_PATH + "/vipdoc/sh/lday/sh880904.day";
+        String filePath_bk2 = TDX_PATH + "/vipdoc/sh/lday/sh880948.day";
+        String filePath_zs = TDX_PATH + "/vipdoc/sh/lday/sh880003.day";
+        String filePath_zs2 = TDX_PATH + "/vipdoc/sh/lday/sz399106.day";
 
-        List<LdayDTO> stockDataList = parse(filePath_a);
-        for (LdayDTO stockData : stockDataList) {
-            System.out.println(JSON.toJSONString(stockData));
+
+        List<LdayDTO> stockDataList = parse(filePath_zs);
+        for (LdayDTO e : stockDataList) {
+            String[] item = {e.code, String.valueOf(e.tradeDate), String.format("%.2f", e.open), String.format("%.2f", e.high), String.format("%.2f", e.low), String.format("%.2f", e.close), String.valueOf(e.amount), String.valueOf(e.vol), String.format("%.2f", e.changePct)};
+            System.out.println(JSON.toJSONString(item));
         }
 
 
@@ -134,7 +140,7 @@ public class LdayParser {
             // 收盘价
             float close = (float) byteBuffer.getInt() / 100;
             // 成交额（元）
-            BigDecimal amount = BigDecimal.valueOf(byteBuffer.getFloat());
+            BigDecimal amount = new BigDecimal(byteBuffer.getFloat());
             // 成交量
             int vol = byteBuffer.getInt();
             // 保留字段
@@ -144,21 +150,28 @@ public class LdayParser {
             int year = date / 10000;
             int month = (date % 10000) / 100;
             int day = date % 100;
-            LocalDate tradeDate = LocalDate.of(year, month, day);
-            // String dd = String.format("%04d-%02d-%02d", year, month, day);
+            LocalDate tradeDate;
+            try {
+                tradeDate = LocalDate.of(year, month, day);
+            } catch (Exception ex) {
+                log.error("code : {} , date : {}", code, date);
+                continue;
+            }
 
 
             if (i == 0) {
                 preClose = close;
             }
 
-            float ratio = Math.round((close - preClose) / preClose * 100 * 100.0f) / 100.0f;
+            float changePct = Math.round((close - preClose) / preClose * 100 * 100.0f) / 100.0f;
             preClose = close;
 
 
-            // String[] item = {code, tradeDate.format(DateTimeFormatter.BASIC_ISO_DATE), String.format("%.2f", open), String.format("%.2f", high), String.format("%.2f", low), String.format("%.2f", close), String.valueOf(amount), String.valueOf(vol), String.format("%.2f", ratio)};
+            // String[] item = {code, String.valueOf(tradeDate), String.format("%.2f", open), String.format("%.2f", high), String.format("%.2f", low), String.format("%.2f", close), amount.toPlainString(), String.valueOf(vol), String.format("%.2f", changePct)};
+            // System.out.println(JSON.toJSONString(item));
 
-            LdayDTO dto = new LdayDTO(code, tradeDate, of(open), of(high), of(low), of(close), amount, of(vol), of(ratio));
+
+            LdayDTO dto = new LdayDTO(code, tradeDate, of(open), of(high), of(low), of(close), amount, vol, of(changePct));
 
 
             dtoList.add(dto);
@@ -184,8 +197,8 @@ public class LdayParser {
     }
 
 
-    private static BigDecimal of(float val) {
-        return BigDecimal.valueOf(val);
+    private static BigDecimal of(Number val) {
+        return new BigDecimal(String.valueOf(val));
     }
 
 
@@ -206,8 +219,8 @@ public class LdayParser {
         private BigDecimal low;
         private BigDecimal close;
         private BigDecimal amount;
-        private BigDecimal vol;
-        private BigDecimal ratio;
+        private Integer vol;
+        private BigDecimal changePct;
     }
 
 }
