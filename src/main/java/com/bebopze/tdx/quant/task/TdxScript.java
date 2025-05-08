@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.bebopze.tdx.quant.constant.TdxConst.TDX_PATH;
+import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 import static com.bebopze.tdx.quant.util.DateUtils.formatMillis;
 import static com.bebopze.tdx.quant.util.SleepUtils.winSleep;
 import static java.awt.event.KeyEvent.*;
@@ -24,7 +24,7 @@ import static java.awt.event.KeyEvent.*;
  * - 每日盘后   自定执行 task：   拉取数据 -> 刷新扩展数据 -> 自动选股
  *
  * @author: bebopze
- * @date: 2025/5/4
+ * @date: 2024/9/27
  */
 @Slf4j
 public class TdxScript {
