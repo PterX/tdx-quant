@@ -17,7 +17,7 @@ import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 
 
 /**
- * tdxzs3.cfg   -   解析
+ * 通达信 tdxzs3.cfg   -   解析
  * -
  * -   /T0002/hq_cache/tdxzs3.cfg               全部板块（含 板块-父子关系）     ->     code - name   -   bk_type
  *
@@ -139,7 +139,7 @@ public class Tdxzs3Parser {
                     Tdxzs3DTO dto = new Tdxzs3DTO();
                     dto.setName(name);
                     dto.setCode(code);
-                    dto.setBlockType(block_type);
+                    dto.setBlockType(Integer.valueOf(block_type));
                     dto.setEndLevel(Integer.valueOf(end_level));
                     dto.setLevel(level);
                     dto.setTXCode(TXCode);
@@ -201,7 +201,7 @@ public class Tdxzs3Parser {
         /**
          * 板块类型：2/3/4/5/12
          */
-        String blockType;
+        Integer blockType;
 
         /**
          * - 未知

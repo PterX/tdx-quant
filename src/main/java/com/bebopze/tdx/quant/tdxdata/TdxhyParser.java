@@ -16,7 +16,7 @@ import static com.bebopze.tdx.quant.common.constant.TdxConst.TDX_PATH;
 
 
 /**
- * tdxhy.cfg   -   解析
+ * 通达信 tdxhy.cfg   -   解析
  * -
  * -   /T0002/hq_cache/tdxhy.cfg               个股 - 行业板块（研究行业 + 普通行业）
  *
