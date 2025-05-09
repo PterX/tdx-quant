@@ -7,8 +7,8 @@ import com.bebopze.tdx.quant.common.domain.req.SubmitTradeV2ReqDTO;
 import com.bebopze.tdx.quant.service.TradeService;
 import com.bebopze.tdx.quant.util.PropsUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 /**
  * BS
@@ -22,10 +22,6 @@ public class TradeServiceImpl implements TradeService {
 
     // @Value("eastmoney.validatekey")
     private static String validatekey = PropsUtil.getSid();
-
-
-    @Autowired
-    private EastMoneyHttpClient client;
 
 
     @Override
@@ -45,7 +41,7 @@ public class TradeServiceImpl implements TradeService {
     public JSONObject wdcc() {
 
 
-        client.queryCreditNewPosV2();
+        EastMoneyHttpClient.queryCreditNewPosV2();
 
 
         SubmitTradeV2ReqDTO reqDTO = new SubmitTradeV2ReqDTO();
@@ -56,7 +52,7 @@ public class TradeServiceImpl implements TradeService {
 
 
         // 委托单号
-        Integer wtbh = client.submitTradeV2(null, TradeTypeEnum.DANBAO_SELL, reqDTO);
+        Integer wtbh = EastMoneyHttpClient.submitTradeV2(null, TradeTypeEnum.DANBAO_SELL, reqDTO);
 
 
         return null;
